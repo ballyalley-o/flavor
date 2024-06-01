@@ -4,11 +4,12 @@ use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{Debug, Display, Result as FmtResult, Formatter};
 use std::str;
+use super::QueryString;
 
-
+#[derive(Debug)]
 pub struct Request<'buf> {
     path: &'buf str,
-    query_string: Option<&'buf str>,
+    query_string: Option<QueryString<'buf>>,
     method: Method
 }
 
@@ -34,7 +35,7 @@ impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
         let mut query_string = None;
 
         if let Some(i) = path.find('?') {
-            query_string = Some(&path[i + 1..]);
+            query_string = Some(QueryString::from(&path[i + 1..]));
             path = &path[..i];
         }
 
